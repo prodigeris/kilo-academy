@@ -1,0 +1,16 @@
+{
+    "name": "narku/kilo",
+    "authors": [
+        {
+            "name": "rositatisor",
+            "email": "70884246+rositatisor@users.noreply.github.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Kilo\\": "model",
+            "Kilo\\Shape\\": "model/Shape"
+        }
+    }
+}
