@@ -8,7 +8,6 @@ class Rectangle implements Shape
 {
     private float $length;
     private float $height;
-    private RectangleGeometry $geometry;
 
     /**
      * Rectangle constructor.
@@ -19,7 +18,6 @@ class Rectangle implements Shape
     {
         $this->length = $length;
         $this->height = $height;
-        $this->setGeometry();
     }
 
     /**
@@ -38,14 +36,12 @@ class Rectangle implements Shape
         return $this->height;
     }
 
-
-    public function setGeometry(): void
+    public function calcPerimeter(): float
     {
-        $this->geometry = new RectangleGeometry($this);
+        return ($this->getHeight() * 2)+($this->getLength() * 2);
     }
-
-    public function getGeometry(): RectangleGeometry
+    public function calcArea(): float
     {
-        return $this->geometry;
+        return ($this->getHeight() * $this->getLength());
     }
 }

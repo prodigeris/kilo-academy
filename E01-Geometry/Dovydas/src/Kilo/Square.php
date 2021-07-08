@@ -16,23 +16,7 @@ class Square implements Shape
     {
         $this->length = $length;
         $this->height = $height;
-        $this->setGeometry();
     }
-
-
-    public function setGeometry(): void
-    {
-        $this->geometry = new SquareGeometry($this);
-    }
-
-    /**
-     * @return Geometry|SquareGeometry
-     */
-    public function getGeometry(): Geometry|SquareGeometry
-    {
-        return $this->geometry;
-    }
-
     /**
      * @return float
      */
@@ -47,6 +31,15 @@ class Square implements Shape
     public function getHeight(): float
     {
         return $this->height;
+    }
+
+    public function calcPerimeter(): float
+    {
+        return ($this->getHeight() * 2)+($this->getLength() * 2);
+    }
+    public function calcArea(): float
+    {
+        return ($this->getHeight() * $this->getLength());
     }
 
 

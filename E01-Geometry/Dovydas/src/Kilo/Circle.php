@@ -7,16 +7,14 @@ namespace Kilo;
 class Circle implements Shape
 {
     private float $radius;
-    private CircleGeometry $geometry;
 
     /**
      * Circle constructor.
-     * @param $radius
+     * @param float $radius
      */
-    public function __construct($radius)
+    public function __construct(float $radius)
     {
         $this->radius = $radius;
-        $this->setGeometry();
     }
 
     /**
@@ -27,13 +25,14 @@ class Circle implements Shape
         return $this->radius;
     }
 
-    public function setGeometry(): void
+
+    public function calcPerimeter(): float
     {
-        $this->geometry = new CircleGeometry($this);
+        return 2*pi()*$this->getRadius();
     }
 
-    public function getGeometry(): CircleGeometry
+    public function calcArea(): float
     {
-        return $this->geometry;
+        return pi()*($this->getRadius()**2);
     }
 }

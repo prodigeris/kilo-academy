@@ -7,14 +7,12 @@ class Geometry
 
     public function perimeter(Shape $shape): float
     {
-        $geometryRules = $shape->getGeometry();
-        return $geometryRules->calcPerimeter();
+        return $shape->calcPerimeter();
     }
 
     public function area(Shape $shape): float
     {
-        $geometryRules = $shape->getGeometry();
-        return $geometryRules->calcArea();
+        return $shape->calcArea();
     }
 
 }

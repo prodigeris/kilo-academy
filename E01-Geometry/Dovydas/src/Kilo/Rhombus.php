@@ -9,7 +9,6 @@ class Rhombus implements Shape
     private float $side;
     private float $diagonal1;
     private float $diagonal2;
-    private RhombusGeometry $geometry;
 
     /**
      * Rhombus constructor.
@@ -21,7 +20,6 @@ class Rhombus implements Shape
         $this->diagonal1 = $diagonal1;
         $this->diagonal2 = $diagonal2;
         $this->side = sqrt($diagonal1**2 + $diagonal2**2)/2;
-        $this->setGeometry();
     }
 
     /**
@@ -48,13 +46,14 @@ class Rhombus implements Shape
         return $this->diagonal2;
     }
 
-    public function setGeometry(): void
+
+    public function calcPerimeter(): float
     {
-        $this->geometry = new RhombusGeometry($this);
+        return $this->getSide()*4;
     }
 
-    public function getGeometry(): RhombusGeometry
+    public function calcArea(): float
     {
-        return $this->geometry;
+        return $this->getDiagonal1() * $this->getDiagonal2() / 2;
     }
 }
