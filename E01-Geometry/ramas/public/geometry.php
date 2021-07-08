@@ -9,54 +9,51 @@ use Kilo\Geometry\Shape\Rectangle;
 require_once '../vendor/autoload.php';
 
 /* ---- ---- SQUARE ---- ---- */
-$square = new Square(2);
-$geometry = new Geometry($square);
+$geometry = new Geometry();
 
 echo '<pre>';
 
+$square = new Square(2);
 echo '<strong>Square:</strong><br/>';
 
-echo 'Area: ' . $geometry->area();
+echo 'Area: ' . $geometry->area($square);
 
 echo '<br/>';
 
-echo 'Perimeter: ' . $geometry->perimeter();
+echo 'Perimeter: ' . $geometry->perimeter($square);
 
 /* ---- ---- RHOMBUS ---- ---- */
 $rhombus = new Rhombus(10, 8);
-$geometryRhombus = new Geometry($rhombus);
 echo '<br/><br/>';
 
 echo '<strong>Rhombus:</strong><br/>';
 
-echo 'Area: ' . $geometryRhombus->area();
+echo 'Area: ' . $geometry->area($rhombus);
 
 echo '<br/>';
 
-echo 'Perimeter: ' . $geometryRhombus->perimeter();
+echo 'Perimeter: ' . $geometry->perimeter($rhombus);
 
 /* ---- ---- RECTANGLE ---- ---- */
 $rectangle = new Rectangle(10, 8);
-$geometryRectangle = new Geometry($rectangle);
 echo '<br/><br/>';
 
 echo '<strong>Rectangle:</strong><br/>';
 
-echo 'Area: ' . $geometryRectangle->area();
+echo 'Area: ' . $geometry->area($rectangle);
 
 echo '<br/>';
 
-echo 'Perimeter: ' . $geometryRectangle->perimeter();
+echo 'Perimeter: ' . $geometry->perimeter($rectangle);
 
 /* ---- ---- CIRCLE ---- ---- */
 $circle = new Circle(6);
-$geometryCircle = new Geometry($circle);
 echo '<br/><br/>';
 
 echo '<strong>Circle:</strong><br/>';
 
-echo 'Area: ' . $geometryCircle->area();
+echo 'Area: ' . $geometry->area($circle);
 
 echo '<br/>';
 
-echo 'Perimeter: ' . $geometryCircle->perimeter();
+echo 'Perimeter: ' . $geometry->perimeter($circle);
