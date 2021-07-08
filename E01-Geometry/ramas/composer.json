@@ -1,0 +1,16 @@
+{
+    "name": "ramas/kilo-academy",
+    "description": "Homeworks for KA.",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ramas",
+            "email": "ramas.developer@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {"Kilo\\": "src/"}
+    }
+}
