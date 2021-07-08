@@ -8,20 +8,13 @@ use Kilo\Geometry\Shape\ShapeInterface;
 
 class Geometry
 {
-    private $shape;
-
-    public function __construct(ShapeInterface $shape)
+    public function area(ShapeInterface $shape): float
     {
-        $this->shape = $shape;
+        return $shape->calculateArea();
     }
 
-    public function area(): float
+    public function perimeter(ShapeInterface $shape): float
     {
-        return $this->shape->calculateArea();
-    }
-
-    public function perimeter(): float
-    {
-        return $this->shape->calculatePerimeter();
+        return $shape->calculatePerimeter();
     }
 }
