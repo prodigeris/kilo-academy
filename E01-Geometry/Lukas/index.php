@@ -9,8 +9,8 @@ use Geometry\Shapes\Square;
 
 $shape = new Square(7);
 $shape1 = new Circle(7);
-$shape2 = new Rectangle(2,5);
-$shape3 = new Rhombus(5,3);
+$shape2 = new Rectangle(2, 5);
+$shape3 = new Rhombus(5, 2);
 $geometry = new Geometry();
 $geometry->calculate($shape);
 $geometry->calculate($shape1);

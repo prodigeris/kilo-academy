@@ -3,22 +3,43 @@
 namespace Geometry\Shapes;
 
 use Geometry\ShapeInterface;
+use InvalidArgumentException;
 
 class Circle implements ShapeInterface
 {
+    /**
+     * @var float
+     */
     public float $radius;
 
-    public function __construct($radius)
+    /**
+     * Circle constructor.
+     * @param float $radius
+     */
+    public function __construct(float $radius)
     {
+        if ($radius <= 0) {
+            throw new InvalidArgumentException(
+                'Invalid data input (no negative numbers!)'
+            );
+        }
         $this->radius = $radius;
     }
 
-    public function area(){
-        return 3.14 * ($this->radius * $this->radius);
+    /**
+     * @return float
+     */
+    public function area(): float
+    {
+        return round(pi() * ($this->radius * $this->radius), 2);
     }
 
-    public function perimeter(){
-        return 2 * 3.14 * $this->radius;
+    /**
+     * @return float
+     */
+    public function perimeter(): float
+    {
+        return round(2 * pi() * $this->radius, 2);
     }
 
 }
