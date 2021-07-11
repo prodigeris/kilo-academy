@@ -18,6 +18,7 @@ use RuntimeException;
  */
 class WorkoutManager
 {
+    // array -> collections???
     private array $walkerWorkouts;
 
     private array $beginnerWorkouts;
@@ -61,6 +62,7 @@ class WorkoutManager
 
     public function getWorkoutIdByScore(int $score): ?int
     {
+        // all if statements could be transformed in different class or interface?
         if (Client::BEGINNER_RANGE[0] <= $score && $score <= Client::BEGINNER_RANGE[1]) {
             if (empty($this->beginnerWorkouts)) {
                 return null;
@@ -100,6 +102,7 @@ class WorkoutManager
         return $this->walkerWorkouts[array_rand($this->walkerWorkouts)];
     }
 
+    // separate class for retrieving workout or workout plans by scores and/or count?
     public function getWorkoutByScore(int $score): ?Workout
     {
         $id = $this->getWorkoutIdByScore($score);
@@ -110,6 +113,7 @@ class WorkoutManager
         return Workout::find($id);
     }
 
+    // create separate class for WorkoutPlan?
     public function getOneByVersionScoreAndCount(int $version, int $score, int $workoutCount): ?WorkoutPlan
     {
         $version = $version === 1 ? null : $version;
