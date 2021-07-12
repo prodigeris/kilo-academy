@@ -28,14 +28,12 @@ class WorkoutManager implements check
 
     private array $proWorkouts;
 
-    private $checkInterface;
-
-    public function __construct(check $checkInterface)
+    public function __construct()
     {
         if (!Schema::hasTable('workouts')) {
             throw new \mysqli_sql_exception("DB don't have 'workouts table'");
         }
-        $this->checkInterface = $checkInterface;
+
         $this->walkerWorkouts = $this->getWhereBetween(Client::WALKER_RANGE);
         $this->beginnerWorkouts = $this->getWhereBetween(Client::BEGINNER_RANGE);
         $this->intermediateWorkouts = $this->getWhereBetween(Client::INTERMEDIATE_RANGE);
@@ -51,17 +49,6 @@ class WorkoutManager implements check
         }
         return $workout;
     }
-
-    private function getWhereBetween(enum $enum): array
-    {
-        return Workout::whereBetween('level', $enum)->pluck('id')->toArray();
-    }
-
-    private function getRandomVisibleRecord(): Workout
-    {
-        return Workout::where('is_visible', true)->inRandomOrder()->first();
-    }
-
 
     public function getWorkoutIdByScore(int $score): ?int
     {
@@ -86,48 +73,33 @@ class WorkoutManager implements check
 
     public function getWorkoutByScore(int $score): ?Workout
     {
-
         $id = $this->checkInterface->getWorkoutIdByScore($score);
-        if (!$id) {
-            return null;
-        }
-
-        return Workout::find($id);
+        return $this->returnWorkoutById($id);
     }
 
     public function getOneByVersionScoreAndCount(int $version, int $score, int $workoutCount): ?WorkoutPlan
     {
-        $version = $version === 1 ? null : $version;
-
-        return WorkoutPlan::where('training_plan->version', $version)
-            ->where('running_level', $score)
-            ->where('workout_count', $workoutCount)
-            ->first();
+        $checkedVersion = $this->checkByParameter($version, 1);
+        return $this->getWorkoutsPlanByParameters($checkedVersion, $score, $workoutCount, 'first');
     }
 
-    /**
-     * @return Collection|WorkoutPlan[]
-     */
-    public function getAllByVersionScoreAndCount(int $version, int $score, int $workoutCount): Collection
+    public function getAllByVersionScoreAndCount(int $version, int $score, int $workoutCount): ?WorkoutPlan
     {
         $checkedVersion = $this->checkByParameter($version, 1);
-
-        return WorkoutPlan::where('training_plan->version', $checkedVersion)
-            ->where('running_level', $score)
-            ->where('workout_count', $workoutCount)
-            ->get();
+        return $this->getWorkoutsPlanByParameters($checkedVersion, $score, $workoutCount, 'get');
     }
+
 
     public function getByVersionAndScore(int $version, int $score): ?WorkoutPlan
     {
         $checkedVersion = $this->checkByParameter($version, 1);
-        return $this->getWorkoutsPlanByVersionAndScore($checkedVersion, $score, 'running_level');
+        return $this->getWorkoutsPlanByParameter($checkedVersion, $score, 'running_level');
     }
 
     public function getByVersionAndCount(int $version, int $score): ?WorkoutPlan
     {
         $checkedVersion = $this->checkByParameter($version, 1);
-        return $this->getWorkoutsPlanByVersionAndScore($checkedVersion, $score, 'workout_count');
+        return $this->getWorkoutsPlanByParameter($checkedVersion, $score, 'workout_count');
     }
 
     /**
@@ -151,9 +123,9 @@ class WorkoutManager implements check
     }
 
     /**
-     * @return array|null
+     * @return int|null
      */
-    private function returnWorkoutIdByScore(array $workouts): ?array
+    private function returnWorkoutIdByScore(array $workouts): ?int
     {
         if (empty($workouts)) {
             return null;
@@ -161,11 +133,40 @@ class WorkoutManager implements check
         return $workouts[array_rand($workouts)];
     }
 
+    /**
+     * @return Workout|null
+     */
+    private function returnWorkoutById(int $id): ?Workout
+    {
+        if (empty($id)) {
+            return null;
+        }
+        return Workout::find($id);
+    }
+
     private function getWorkoutsPlanByParameter(?int $checkedVersion, int $score, string $parameter): WorkoutPlan
     {
         return WorkoutPlan::where('training_plan->version', $checkedVersion)
             ->where($parameter, $score)
             ->first();
+    }
+
+    private function getWorkoutsPlanByParameters(?int $checkedVersion, int $score, int $workoutCount, string $function): ?WorkoutPlan
+    {
+        return WorkoutPlan::where('training_plan->version', $checkedVersion)
+            ->where('running_level', $score)
+            ->where('workout_count', $workoutCount)
+            ->$function();
+    }
+
+    private function getWhereBetween(ClientEnum $enum): array
+    {
+        return Workout::whereBetween('level', $enum)->pluck('id')->toArray();
+    }
+
+    private function getRandomVisibleRecord(): Workout
+    {
+        return Workout::where('is_visible', true)->inRandomOrder()->first();
     }
 }
 
