@@ -119,7 +119,6 @@ class WorkoutManager implements check
     private function checkScore(int $score, ClientEnum $enum): bool
     {
         return ($enum[0] <= $score && $score <= $enum[1]);
-        //return Client::BEGINNER_RANGE[0] <= $score && $score <= Client::BEGINNER_RANGE[1];
     }
 
     /**
