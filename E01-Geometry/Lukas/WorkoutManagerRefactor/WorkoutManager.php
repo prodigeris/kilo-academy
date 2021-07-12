@@ -9,7 +9,6 @@ use App\Workout;
 use App\WorkoutPlan;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
-use RuntimeException;
 
 /**
  * Class TipManager
@@ -18,15 +17,15 @@ use RuntimeException;
  */
 class WorkoutManager
 {
-    private array $walkerWorkouts;
+    protected array $walkerWorkouts;
 
-    private array $beginnerWorkouts;
+    protected array $beginnerWorkouts;
 
-    private array $intermediateWorkouts;
+    protected array $intermediateWorkouts;
 
-    private array $advancedWorkouts;
+    protected array $advancedWorkouts;
 
-    private array $proWorkouts;
+    protected array $proWorkouts;
 
     public function __construct()
     {
@@ -40,6 +39,11 @@ class WorkoutManager
         $this->advancedWorkouts = Workout::whereBetween('level', Client::ADVANCED_RANGE)->pluck('id')->toArray();
         $this->proWorkouts = Workout::whereBetween('level', Client::PRO_RANGE)->pluck('id')->toArray();
     }
+}
+
+namespace App\Services;
+
+class WorkoutByScore extends WorkoutManager{
 
     public function getWorkoutIdByScore(int $score): ?int
     {
@@ -91,6 +95,36 @@ class WorkoutManager
 
         return Workout::find($id);
     }
+}
+
+namespace App\Services;
+
+use RuntimeException;
+
+class RandomWorkout {
+
+    public function getRandomWorkout(): Workout
+    {
+        $workout = Workout::inRandomOrder()->first();
+        if (! $workout) {
+            throw new RuntimeException('No workout has been found');
+        }
+        return $workout;
+    }
+
+    public function getRandomVisibleWorkout(): Workout
+    {
+        $workout = Workout::where('is_visible', true)->inRandomOrder()->first();
+        if (! $workout) {
+            throw new RuntimeException('No workout has been found');
+        }
+        return $workout;
+    }
+}
+
+namespace App\Services;
+
+class WorkoutFilter {
 
     public function getOneByVersionScoreAndCount(int $version, int $score, int $workoutCount): ?WorkoutPlan
     {
@@ -131,28 +165,5 @@ class WorkoutManager
         return WorkoutPlan::where('training_plan->version', $version)
             ->where('workout_count', $score)
             ->first();
-    }
-}
-
-namespace App\Services;
-
-class RandomWorkout {
-
-    public function getRandomWorkout(): Workout
-    {
-        $workout = Workout::inRandomOrder()->first();
-        if (! $workout) {
-            throw new RuntimeException('No workout has been found');
-        }
-        return $workout;
-    }
-
-    public function getRandomVisibleWorkout(): Workout
-    {
-        $workout = Workout::where('is_visible', true)->inRandomOrder()->first();
-        if (! $workout) {
-            throw new RuntimeException('No workout has been found');
-        }
-        return $workout;
     }
 }
