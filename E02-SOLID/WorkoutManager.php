@@ -11,6 +11,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
 use RuntimeException;
 
+require "Check.php";
+
 /**
  * Class TipManager
  *
@@ -167,9 +169,4 @@ class WorkoutManager implements check
     {
         return Workout::where('is_visible', true)->inRandomOrder()->first();
     }
-}
-
-interface check
-{
-    public function checkByParameter(int $parameter1, int $parameter2);
 }
