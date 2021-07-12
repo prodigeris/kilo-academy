@@ -31,14 +31,19 @@ class WorkoutManager
     public function __construct()
     {
         if (! Schema::hasTable('workouts')) {
-            return;
+            throw new \mysqli_sql_exception("DB don't have 'workouts table'");
         }
 
-        $this->walkerWorkouts = Workout::whereBetween('level', Client::WALKER_RANGE)->pluck('id')->toArray();
-        $this->beginnerWorkouts = Workout::whereBetween('level', Client::BEGINNER_RANGE)->pluck('id')->toArray();
-        $this->intermediateWorkouts = Workout::whereBetween('level', Client::INTERMEDIATE_RANGE)->pluck('id')->toArray();
-        $this->advancedWorkouts = Workout::whereBetween('level', Client::ADVANCED_RANGE)->pluck('id')->toArray();
-        $this->proWorkouts = Workout::whereBetween('level', Client::PRO_RANGE)->pluck('id')->toArray();
+        $this->walkerWorkouts = $this->getWhereBetween(Client::WALKER_RANGE);
+        $this->beginnerWorkouts = $this->getWhereBetween(Client::BEGINNER_RANGE);
+        $this->intermediateWorkouts = $this->getWhereBetween(Client::INTERMEDIATE_RANGE);
+        $this->advancedWorkouts = $this->getWhereBetween(Client::ADVANCED_RANGE);
+        $this->proWorkouts = $this->getWhereBetween(Client::PRO_RANGE);
+    }
+
+    private function getWhereBetween(enum $enum):array
+    {
+        return Workout::whereBetween('level', $enum)->pluck('id')->toArray();
     }
 
     public function getRandomWorkout(): Workout
