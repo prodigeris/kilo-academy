@@ -11,5 +11,5 @@ interface ByVersionScoreAndCount
      * @param int $workoutCount
      * @return mixed
      */
-    public function filter(int $version, int $score, int $workoutCount);
+    public function filterWorkout(int $version, int $score, int $workoutCount);
 }
