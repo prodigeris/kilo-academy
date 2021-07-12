@@ -43,14 +43,7 @@ class WorkoutManager implements check
         $this->proWorkouts = $this->getWhereBetween(Client::PRO_RANGE);
     }
 
-    public function getRandomVisibleWorkout(): Workout
-    {
-        $workout = $this->getRandomVisibleRecord();
-        if (!$workout) {
-            throw new RuntimeException('No workout has been found');
-        }
-        return $workout;
-    }
+
 
     public function getWorkoutIdByScore(int $score): ?int
     {
@@ -165,8 +158,5 @@ class WorkoutManager implements check
         return Workout::whereBetween('level', $enum)->pluck('id')->toArray();
     }
 
-    private function getRandomVisibleRecord(): Workout
-    {
-        return Workout::where('is_visible', true)->inRandomOrder()->first();
-    }
+
 }
