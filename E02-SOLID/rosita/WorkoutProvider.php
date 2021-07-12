@@ -34,6 +34,8 @@ class WorkoutProvider
 
     public function getWorkoutIdByScore(): ?int
     {
+        // need to get rid of these similar IF's -> new parent class with assigned level? or new method?...
+
         if (Client::BEGINNER_RANGE[0] <= $this->score && $this->score <= Client::BEGINNER_RANGE[1]) {
             return empty($this->beginnerWorkoutsWorkouts) ? null : $this->beginnerWorkouts[array_rand($this->beginnerWorkouts)];
         }
