@@ -16,7 +16,7 @@ use RuntimeException;
  *
  * @package App\Services
  */
-class WorkoutManager
+class WorkoutManager implements check
 {
     private array $walkerWorkouts;
 
@@ -28,17 +28,27 @@ class WorkoutManager
 
     private array $proWorkouts;
 
-    public function __construct()
+    private $checkInterface;
+
+    public function __construct(check $checkInterface)
     {
         if (! Schema::hasTable('workouts')) {
             throw new \mysqli_sql_exception("DB don't have 'workouts table'");
         }
-
+        $this->checkInterface =$checkInterface;
         $this->walkerWorkouts = $this->getWhereBetween(Client::WALKER_RANGE);
         $this->beginnerWorkouts = $this->getWhereBetween(Client::BEGINNER_RANGE);
         $this->intermediateWorkouts = $this->getWhereBetween(Client::INTERMEDIATE_RANGE);
         $this->advancedWorkouts = $this->getWhereBetween(Client::ADVANCED_RANGE);
         $this->proWorkouts = $this->getWhereBetween(Client::PRO_RANGE);
+    }
+    public function getRandomVisibleWorkout(): Workout
+    {
+        $workout = $this->getRandomVisibleRecord();
+        if (!$workout) {
+            throw new RuntimeException('No workout has been found');
+        }
+        return $workout;
     }
 
     private function getWhereBetween(enum $enum):array
@@ -46,47 +56,28 @@ class WorkoutManager
         return Workout::whereBetween('level', $enum)->pluck('id')->toArray();
     }
 
-    public function getRandomVisibleWorkout(): Workout
+    private function getRandomVisibleRecord(): Workout
     {
-        $workout = Workout::where('is_visible', true)->inRandomOrder()->first();
-        if (! $workout) {
-            throw new RuntimeException('No workout has been found');
-        }
-        return $workout;
+        return Workout::where('is_visible', true)->inRandomOrder()->first();
     }
+
 
     public function getWorkoutIdByScore(int $score): ?int
     {
-        if (Client::BEGINNER_RANGE[0] <= $score && $score <= Client::BEGINNER_RANGE[1]) {
-            if (empty($this->beginnerWorkouts)) {
-                return null;
-            }
-
-            return $this->beginnerWorkouts[array_rand($this->beginnerWorkouts)];
+        if ($this->checkScore($score, Client::BEGINNER_RANGE)) {
+            return $this->returnWorkoutIdByScore($this->beginnerWorkouts);
         }
 
-        if (Client::INTERMEDIATE_RANGE[0] <= $score && $score <= Client::INTERMEDIATE_RANGE[1]) {
-            if (empty($this->intermediateWorkouts)) {
-                return null;
-            }
-
-            return $this->intermediateWorkouts[array_rand($this->intermediateWorkouts)];
+        if ($this->checkScore($score, Client::INTERMEDIATE_RANGE)) {
+            return $this->returnWorkoutIdByScore($this->intermediateWorkouts);
         }
 
-        if (Client::ADVANCED_RANGE[0] <= $score && $score <= Client::ADVANCED_RANGE[1]) {
-            if (empty($this->advancedWorkouts)) {
-                return null;
-            }
-
-            return $this->advancedWorkouts[array_rand($this->advancedWorkouts)];
+        if ($this->checkScore($score, Client::ADVANCED_RANGE)) {
+            return $this->returnWorkoutIdByScore($this->advancedWorkouts);
         }
 
-        if (Client::PRO_RANGE[0] <= $score && $score <= Client::PRO_RANGE[1]) {
-            if (empty($this->proWorkouts)) {
-                return null;
-            }
-
-            return $this->proWorkouts[array_rand($this->proWorkouts)];
+        if ($this->checkScore($score, Client::PRO_RANGE)) {
+            return $this->returnWorkoutIdByScore($this->proWorkouts);
         }
 
         if (empty($this->walkerWorkouts)) {
@@ -98,7 +89,8 @@ class WorkoutManager
 
     public function getWorkoutByScore(int $score): ?Workout
     {
-        $id = $this->getWorkoutIdByScore($score);
+
+        $id = $this->checkInterface->getWorkoutIdByScore($score);
         if (! $id) {
             return null;
         }
@@ -133,6 +125,8 @@ class WorkoutManager
     {
         $version = $version === 1 ? null : $version;
 
+        $version = $this->workoutCheck->checkByParameter($version, 1);
+
         return WorkoutPlan::where('training_plan->version', $version)
             ->where('running_level', $score)
             ->first();
@@ -146,5 +140,37 @@ class WorkoutManager
             ->where('workout_count', $score)
             ->first();
     }
+
+    /**
+     * @return int|null
+     */
+    public function checkByParameter(int $firstParameter, int $secondParameter)
+    {
+        return $firstParameter === $secondParameter ? null : $firstParameter;
+    }
+
+    /**
+     * @return int|null
+     */
+    private function checkScore(int $score, enum $enum): bool
+    {
+        return ($enum[0] <= $score && $score <= $enum[1]);
+        //return Client::BEGINNER_RANGE[0] <= $score && $score <= Client::BEGINNER_RANGE[1];
+    }
+
+    /**
+     * @return bool|null
+     */
+    private function returnWorkoutIdByScore(array $workouts): ?bool
+    {
+        if(empty($workouts)) {return null;}
+        return $workouts[array_rand($workouts)];
+    }
 }
+
+interface check
+{
+    public function checkByParameter(int $parameter1, int $parameter2);
+}
+
 
