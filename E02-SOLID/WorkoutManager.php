@@ -73,7 +73,7 @@ class WorkoutManager implements check
 
     public function getWorkoutByScore(int $score): ?Workout
     {
-        $id = $this->checkInterface->getWorkoutIdByScore($score);
+        $id = $this->getWorkoutIdByScore($score);
         return $this->returnWorkoutById($id);
     }
 
