@@ -15,26 +15,43 @@ use Illuminate\Support\Facades\Schema;
  */
 class WorkoutManager
 {
-    protected array $walkerWorkouts;
+    protected array $levels = [];
 
-    protected array $beginnerWorkouts;
-
-    protected array $intermediateWorkouts;
-
-    protected array $advancedWorkouts;
-
-    protected array $proWorkouts;
-
-    public function __construct()
+    public function __construct(array $availableLevels, WorkoutRepository $workoutRepository)
     {
+        if(! $availableLevels) {
+            $availableLevels = [
+                ['walker' => [0, 2]],
+                ['beginner' => [3, 5]],
+                ['intermediate' => [6, 8]],
+                ['advanced' => [9, 12]],
+                ['pro' => [13, 15]],
+            ];
+        }
+
         if (!Schema::hasTable('workouts')) {
             return;
         }
 
-        $this->walkerWorkouts = Workout::whereBetween('level', Client::WALKER_RANGE)->pluck('id')->toArray();
-        $this->beginnerWorkouts = Workout::whereBetween('level', Client::BEGINNER_RANGE)->pluck('id')->toArray();
-        $this->intermediateWorkouts = Workout::whereBetween('level', Client::INTERMEDIATE_RANGE)->pluck('id')->toArray();
-        $this->advancedWorkouts = Workout::whereBetween('level', Client::ADVANCED_RANGE)->pluck('id')->toArray();
-        $this->proWorkouts = Workout::whereBetween('level', Client::PRO_RANGE)->pluck('id')->toArray();
+        foreach($availableLevels as $key => $level) {
+            $this->levels[$level[0]] = $workoutRepository->findBetweenScores($level);
+        }
+    }
+
+    private function getAvailableLevels(): array
+    {
+        return array_keys($this->levels);
+    }
+
+    protected function getLastStep(int $score): int
+    {
+        $levels = $this->getAvailableLevels();
+        foreach ($levels as $level) {
+            if ($level > $score) {
+                break;
+            }
+            $foundLevel = $level;
+        }
+        return $foundLevel;
     }
 }

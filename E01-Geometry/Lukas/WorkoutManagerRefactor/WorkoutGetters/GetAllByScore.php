@@ -11,11 +11,21 @@ class GetAllByScore extends WorkoutManager
 
     /**
      * @param int $score
+     * @return int|null
+     */
+    public function getWorkoutIdByScore(int $score): ?int
+    {
+        $level = $this->getLastStep($score);
+        return array_rand($this->levels[$level]);
+    }
+
+    /**
+     * @param int $score
      * @return Workout|null
      */
     public function getWorkoutByScore(int $score): ?Workout
     {
-        $id = GetIdByScore::class->getWorkoutIdByScore($score);
+        $id = $this->getWorkoutIdByScore($score);
         if (!$id) {
             return null;
         }
