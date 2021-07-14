@@ -22,4 +22,17 @@ class walkerWorkout extends AbstractWorkout
     }
 
 
+    public function getRandomWorkout($visible = false): Workout
+    {
+        if($visible){
+            $workout = Workout::whereBetween('level', Client::WALKER_RANGE)->where('is_visible', true)->inRandomOrder()->first();
+        }
+        else{
+            $workout = Workout::whereBetween('level', Client::WALKER_RANGE)->inRandomOrder()->first();
+        }
+        if (! $workout) {
+            throw new RuntimeException('No workout has been found');
+        }
+        return $workout;
+    }
 }
