@@ -39,4 +39,9 @@ class WorkoutRepository
         }
         return $workout;
     }
+
+    public function findBetweenScores($level): array
+    {
+        // some logic here
+    }
 }

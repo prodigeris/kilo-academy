@@ -3,72 +3,63 @@
 
 namespace App\Services;
 
+use App\Workout;
+use Illuminate\Support\Facades\Schema;
 
 class WorkoutProvider
 {
-    private int $score;
-    private string $level;
+    private array $levels = [];
 
-    private array $walkerWorkouts;
-    private array $beginnerWorkouts;
-    private array $intermediateWorkouts;
-    private array $advancedWorkouts;
-    private array $proWorkouts;
-
-    public function __construct(int $score)
+    public function __construct(array $availableLevels, WorkoutRepository $workoutRepository)
     {
-        $this->score = $score;
-        $this->walkerWorkouts = Workout::whereBetween('level', Client::WALKER_RANGE)->pluck('id')->toArray();
-        $this->beginnerWorkouts = Workout::whereBetween('level', Client::BEGINNER_RANGE)->pluck('id')->toArray();
-        $this->intermediateWorkouts = Workout::whereBetween('level', Client::INTERMEDIATE_RANGE)->pluck('id')->toArray();
-        $this->advancedWorkouts = Workout::whereBetween('level', Client::ADVANCED_RANGE)->pluck('id')->toArray();
-        $this->proWorkouts = Workout::whereBetween('level', Client::PRO_RANGE)->pluck('id')->toArray();
+        // should come from config file
+        if(! $availableLevels) {
+            $availableLevels = [
+                ['walker' => [0, 2]],
+                ['beginner' => [3, 5]],
+                ['intermediate' => [6, 8]],
+                ['advanced' => [9, 12]],
+                ['pro' => [13, 15]],
+            ];
+        }
 
-        $this->assignLevel();
+        if (! Schema::hasTable('workouts')) {
+            return;
+        }
+
+        // 0  => [walkerWorkouts]
+        // 3  => [beginnerWorkouts]
+        // 6  => [intermediateWorkouts]
+        // 9  => [advancedWorkouts]
+        // 13 => [proWorkouts]
+        foreach($availableLevels as $key => $level) {
+            $this->levels[$level[0]] = $workoutRepository->findBetweenScores($level);
+        }
     }
 
-    public function assignLevel(): void
+    public function getAvailableLevels(): array
     {
-        // some logic here
+        return array_keys($this->levels);
     }
 
-    public function getWorkoutIdByScore(): ?int
+    private function getLastStep(int $score): int
     {
-        // need to get rid of these similar IF's -> new parent class with assigned level? or new method?...
-
-        if (Client::BEGINNER_RANGE[0] <= $this->score && $this->score <= Client::BEGINNER_RANGE[1]) {
-            return empty($this->beginnerWorkoutsWorkouts) ? null : $this->beginnerWorkouts[array_rand($this->beginnerWorkouts)];
-        }
-
-        if (Client::INTERMEDIATE_RANGE[0] <= $this->score && $this->score <= Client::INTERMEDIATE_RANGE[1]) {
-            if (empty($this->intermediateWorkouts)) {
-                return null;
+        $availableLevels = $this->getAvailableLevels();
+        // [0, 3, 6, 9, 13]
+        foreach ($availableLevels as $level) {
+            if ($level > $score) {
+                break;
             }
-
-            return $this->intermediateWorkouts[array_rand($this->intermediateWorkouts)];
+            $foundLevel = $level;
         }
+        return $foundLevel;
+    }
 
-        if (Client::ADVANCED_RANGE[0] <= $this->score && $this->score <= Client::ADVANCED_RANGE[1]) {
-            if (empty($this->advancedWorkouts)) {
-                return null;
-            }
+    public function getWorkoutIdByScore(int $score): ?int
+    {
+        $level = $this->getLastStep($score);
 
-            return $this->advancedWorkouts[array_rand($this->advancedWorkouts)];
-        }
-
-        if (Client::PRO_RANGE[0] <= $this->score && $this->score <= Client::PRO_RANGE[1]) {
-            if (empty($this->proWorkouts)) {
-                return null;
-            }
-
-            return $this->proWorkouts[array_rand($this->proWorkouts)];
-        }
-
-        if (empty($this->walkerWorkouts)) {
-            return null;
-        }
-
-        return $this->walkerWorkouts[array_rand($this->walkerWorkouts)];
+        return array_rand($this->levels[$level]);
     }
 
     public function getWorkoutByScore(int $score): ?Workout
