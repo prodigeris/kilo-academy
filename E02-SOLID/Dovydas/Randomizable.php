@@ -6,5 +6,5 @@ namespace App\Services;
 
 interface Randomizable
 {
-    public function getRandomWorkout($visible = false): Workout;
+    public function getRandom(): object;
 }
