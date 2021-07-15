@@ -1,0 +1,5 @@
+/vendor/
+**/.idea
+*.iws
+*.xml
+*.iml
